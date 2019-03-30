@@ -1,6 +1,7 @@
 from flask import Flask
-from demos.bluebb.settings import config
-from demos.bluebb.extensions import bootstrap, db, moment, ckeditor, mail
+from bluebb.settings import config
+from bluebb.extensions import bootstrap, db, moment, ckeditor, mail
+from bluebb.models import Admin, Category
 
 def creat_app(config_name=None):
     if config_name is None:
@@ -41,7 +42,11 @@ def register_shell_context(app):
         return dict(db=db)
 
 def register_template_context(app):
-    pass
+    @app.context_processor
+    def make_template_context():
+            admin = Admin.query.first()
+            categories = Category.query.order_by(Category.name).all()
+            return dict(admin=admin, categories=categories)
 
 def register_errors(app):
     @app.errorhandler(400)
